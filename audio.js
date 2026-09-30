@@ -75,5 +75,6 @@
   document.addEventListener('keydown',unlock,{once:true});
   document.addEventListener('click',e=>{if(e.target.closest('button'))sound('click');});
   document.addEventListener('visibilitychange',()=>{if(document.hidden){music.pause();stopEffects();}else playMusic();});
-  window.MathAudio={prefs,set,sound,startGame:track=>{stopEffects();changeMusic(track==='doom'?'doom':'normal');},exitDoom:()=>{if(mode==='doom')changeMusic('normal');},finish:badges=>sound('victory',badges?'badge':null)};
+  function enterDoom(){if(mode!=='doom'){stopEffects();changeMusic('doom');}}
+  window.MathAudio={prefs,set,sound,enterDoom,startGame:track=>{stopEffects();if(track==='doom')enterDoom();else changeMusic('normal');},exitDoom:()=>{if(mode==='doom')changeMusic('normal');},finish:badges=>sound('victory',badges?'badge':null)};
 })();

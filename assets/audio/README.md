@@ -4,7 +4,7 @@ Les fichiers fournis sont enregistrés dans les dossiers suivants :
 
 - `music/launch.mp3` : premier morceau à chaque ouverture, après la première interaction autorisant le son.
 - `music/background-01.mp3` à `background-06.mp3` : musique du jeu normal. Chaque nouvelle partie choisit un morceau aléatoire parmi ces fichiers et `launch.mp3`, sans répétition immédiate. La lecture continue avec une liste mélangée.
-- `doom/doombackground.mp3` : musique en boucle dès le démarrage d’une partie Doom.
+- `doom/doombackground.mp3` : musique en boucle dès l’accès à l’écran Doom par cinq clics sur le logo ; elle continue sans repartir de zéro au lancement de la partie.
 - `doom/doom-01.mp3` : validation de chaque question Doom, juste, fausse ou expirée.
 - `sfx/click.mp3`, `sfx/error.mp3` : clic et erreur du jeu normal.
 - `sfx/succes-01.mp3` à `succes-03.mp3` : bonne réponse normale, variante aléatoire.
