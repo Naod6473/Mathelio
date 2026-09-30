@@ -1,0 +1,13 @@
+{
+  "music": {
+    "launch": "assets/audio/music/launch.wav",
+    "background": ["assets/audio/music/background-01.wav", "assets/audio/music/background-02.wav"]
+  },
+  "sfx": {
+    "click": ["assets/audio/sfx/click-01.wav"],
+    "success": ["assets/audio/sfx/success-01.wav"],
+    "error": ["assets/audio/sfx/error-01.wav"],
+    "badge": ["assets/audio/sfx/badge-01.wav"],
+    "finish": ["assets/audio/sfx/finish-01.wav"]
+  }
+}

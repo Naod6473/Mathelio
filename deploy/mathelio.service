@@ -1,0 +1,23 @@
+[Unit]
+Description=Mathélio - classement commun
+After=network.target
+
+[Service]
+Type=simple
+User=mathelio
+Group=mathelio
+Environment=PORT=4319
+Environment=MATHELIO_DB=/var/lib/mathelio/mathelio.sqlite
+Environment=MATHELIO_PUBLIC=/var/www/mathelio/current/public
+ExecStart=/usr/bin/node /var/www/mathelio/current/server.cjs
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/mathelio
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

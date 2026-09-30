@@ -5,11 +5,11 @@
   <meta name="theme-color" content="#28235b"><meta name="description" content="Mathélio : ton aventure de calcul mental, avec entraînement, défis et compagnons.">
   <title>Mathélio · À toi de jouer !</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="style.css">
-  <script src="diagnostics.js" defer></script><script src="engine.js" defer></script><script src="script.js" defer></script>
+  <script src="diagnostics.js" defer></script><script src="engine.js" defer></script><script src="progress.js" defer></script><script src="audio.js" defer></script><script src="script.js" defer></script>
 </head>
-<body><header class="topbar"><a class="brand" href="index.html"><span class="brand-icon">✳</span> Mathélio<span class="brand-dot">.</span></a><nav aria-label="Navigation principale"><button data-view="home">Jouer</button><button data-view="collection">Collection</button><button data-view="records">Records</button><button data-view="profiles" id="profile-nav">Mon profil</button></nav></header>
+<body><header class="topbar"><a class="brand" href="index.html"><span class="brand-icon">✳</span> Mathélio<span class="brand-dot">.</span></a><nav aria-label="Navigation principale"><button data-view="home">Jouer</button><button data-view="collection">Collection</button><button data-view="records">Records</button><button data-view="parent">Bilan parent</button><button data-view="settings">Réglages</button><button id="mute" aria-label="Couper le son">🔊</button><button data-view="profiles" id="profile-nav">Mon profil</button></nav></header>
 <div id="storage-warning" class="warning" role="status" hidden>La sauvegarde est indisponible. Tu peux jouer, mais tes progrès seront perdus à la fermeture.</div>
 <main id="app" tabindex="-1"></main>
-<footer><span>Un calcul à la fois, de grands progrès.</span><a href="logs.html">Diagnostic</a><span>v1.0.0 · Données sur cet appareil</span></footer>
+<footer><span>Un calcul à la fois, de grands progrès.</span><a href="logs.html">Diagnostic</a><span>v2.0.0 · Données sur cet appareil</span></footer>
 <div id="toast" class="toast" role="status" hidden></div>
 <noscript>Active JavaScript pour jouer à Mathélio.</noscript></body></html>

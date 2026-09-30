@@ -7,10 +7,14 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['22', '24']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ matrix.node }}
       - run: npm test
-      - run: node --check script.js && node --check engine.js && node --check diagnostics.js && node --check logs.js
+      - run: node --check script.js && node --check engine.js && node --check diagnostics.js && node --check logs.js && node --check progress.js && node --check audio.js && node --check server.cjs
+      - run: bash -n deploy/update.sh && bash -n deploy/rollback.sh

@@ -25,10 +25,20 @@
     return {op,a,b,answer,label:`${fmt(a)} ${{add:'+',sub:'−',mul:'×',div:'÷'}[op]} ${fmt(b)}`};
   }
   function generate(config,rng=Math.random) {
+    if(config.track==='junior') {
+      const pool=[];
+      for(let a=0;a<=19;a++)for(let b=0;b<=9;b++) {
+        if(config.level==='hard') {if(b===0)pool.push({op:'add',a,b:20-a,answer:20-a,complement:true,label:`${a} + ? = 20`,track:'junior'});}
+        else if(a<=9&&(config.level==='easy'?a+b<=10:a+b>=10))pool.push({op:'add',a,b,answer:a+b,label:`${a} + ${b}`,track:'junior'});
+      }
+      for(let i=pool.length-1;i>0;i--){const j=random(0,i,rng);[pool[i],pool[j]]=[pool[j],pool[i]];}
+      return pool.slice(0,config.mode==='challenge'?10:(config.count||5)).map(q=>({...q,level:config.level}));
+    }
     const result=[],seen=new Set();const ops=['add','sub','mul','div'];
-    const order=config.category==='mix'?Array.from({length:10},(_,i)=>ops[i%4]):Array(10).fill(config.category);
+    const count=config.mode==='challenge'?10:(config.count||10);
+    const order=config.category==='mix'?Array.from({length:count},(_,i)=>ops[i%4]):Array(count).fill(config.category);
     for(let i=order.length-1;i>0;i--){const j=random(0,i,rng);[order[i],order[j]]=[order[j],order[i]];}
-    for(const op of order){let q,tries=0;do {q=question(op,config.level,config.table,rng);tries++;}while(seen.has(q.label)&&tries<1000);if(seen.has(q.label))throw new Error('Impossible de générer des questions distinctes');seen.add(q.label);result.push(q);}
+    for(const op of order){if(config.table&&result.length===10)seen.clear();let q,tries=0;do {q=question(op,config.level,config.table,rng);tries++;}while(seen.has(q.label)&&tries<1000);if(seen.has(q.label))throw new Error('Impossible de générer des questions distinctes');seen.add(q.label);result.push({...q,track:'cm1',level:config.level});}
     return result;
   }
   function parse(value){const s=String(value).trim();return /^\d{1,6}([,.]\d{1,2})?$/.test(s)?Number(s.replace(',','.')):null;}

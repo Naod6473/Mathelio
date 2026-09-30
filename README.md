@@ -1,51 +1,61 @@
-# Mathélio
+# Mathélio · version 2
 
-Application de calcul mental pour un enfant de CM1. HTML, CSS et JavaScript natifs, sans compilation, dépendance, compte externe ni appel réseau. Version 1.0.0.
+Application de calcul mental en HTML/CSS/JavaScript natifs. Le jeu personnel reste utilisable sur un serveur statique, sans compilation ni dépendance front-end. Le classement commun facultatif utilise Node.js 22.13 minimum et SQLite intégrée, sans paquet npm externe.
 
-## Ouvrir l’application
-
-Ouvrir `index.html` directement fonctionne. Pour conserver une origine de stockage stable et tester comme sur un serveur, utiliser de préférence un serveur HTTP :
+## Démarrer
 
 ```sh
 npm start
 ```
 
-Puis ouvrir http://127.0.0.1:4318. Node.js est uniquement nécessaire pour cet aperçu et les tests ; il n’est pas nécessaire sur l’hébergement final.
+Aperçu sur http://127.0.0.1:4318 avec classement temporaire en mémoire.
 
-## Fonctionnalités
+```sh
+npm run serve
+```
 
-- Profils locaux (12 maximum), six compagnons, douze accessoires débloqués tous les dix points d’étoiles et douze badges.
-- Entraînement sans pression, seconde tentative et correction ; défi avec score, bonus de rapidité limité et combo plafonné.
-- Dix calculs distincts, opérations séparées ou mélange équilibré, trois niveaux et sélection d’une table.
-- Bilan, révision des erreurs, clavier tactile et physique, virgule et point acceptés.
-- Classements des dix meilleurs défis par opération, niveau et sélection de table.
-- Pause manuelle et automatique quand l’onglet est masqué ; aucune limite de temps imposée.
-- Page `logs.html` : erreurs JavaScript, promesses rejetées, échecs de ressources et de sauvegarde, filtre, export JSON, effacement et test du journal.
+Application et classement persistant sur http://127.0.0.1:4319 ; base `data/mathelio.sqlite`, exclue de Git. Configuration : `PORT`, `MATHELIO_DB`, `MATHELIO_PUBLIC`. En production, Nginx sert les fichiers publics et relaie `/api/` vers ce service. Voir [DEPLOIEMENT.md](DEPLOIEMENT.md).
 
-## Règles
+## Jouer
 
-Les additions faciles restent sous 100, sans retenue. Les soustractions faciles sont sans emprunt. Le niveau moyen inclut les retenues et des additions jusqu’à 200. Le niveau difficile utilise des dixièmes pour addition/soustraction ; les calculs sont préparés en unités entières pour éviter les erreurs flottantes. Aucun résultat négatif, aucune division par zéro ou avec reste.
+- Parcours CM1 : quatre opérations, mélange équilibré, trois difficultés et tables spécifiques.
+- Petits explorateurs (5–6 ans) : chiffres et somme ≤ 10 ; chiffres et somme de 10 à 18 ; compléments à 20. Aide visuelle par points. Aucun bonus de rapidité ni chronomètre affiché dans ce parcours.
+- Entraînement de 5, 10 ou 20 questions ; défis classés de 10 questions. Une table spécifique contient dix calculs distincts : une séance de vingt questions comprend deux passages.
+- Une seconde tentative après la première erreur en entraînement. Un calcul raté revient après trois autres questions si la séance le permet, sinon à la fin. Une reprise est ajoutée au plus une fois par calcul et n'entre pas dans le taux de précision. Les erreurs non résolues restent disponibles pour les séances suivantes, dans la limite de 300.
+- Question suivante après 5 secondes, option désactivable, bouton manuel conservé. Le délai et le temps de réponse s'arrêtent pendant les pauses ; la lecture des corrections est exclue du temps de réponse.
+- Douze profils locaux maximum, six compagnons emoji, douze accessoires, vingt-quatre badges et douze trophées permanents. Les nouveaux compteurs commencent avec la v2 ; les récompenses v1 restent acquises.
+- Mission facultative persistante, changeable, avec deux étoiles attribuées une seule fois par mission accomplie. Après changement, une nouvelle mission peut être réalisée.
+- Bilan parent : précision par opération, tables sous 80 %, dix dernières séances, filtre par parcours. Historique limité aux 200 dernières séances depuis la v2. Ce bilan n'est pas protégé par un mot de passe.
+- Après trois séances comparables, suggestion de difficulté supérieure à partir de 90 % de réussite, ou inférieure sous 50 %. Le joueur doit accepter la suggestion.
 
-Tables faciles : 2, 5, 10 ; moyennes : 2 à 9 ; difficiles : 11, 12, 15, 20, 25. Une table précise (2 à 12) remplace ce choix et possède son classement distinct.
+## Musique
 
-Une bonne réponse au premier essai en défi vaut 100 points, plus 0 à 20 points de vitesse et 0 à 30 points de combo (5 par bonne réponse consécutive supplémentaire). L’évaluation dépend seulement de la justesse. Une partie terminée rapporte 3 étoiles, plus 1 pour au moins 80 % de réponses correctes au premier essai. Une révision qui corrige au moins une erreur rapporte une étoile supplémentaire. Les révisions ne sont pas classées.
+Des motifs synthétisés originaux et des effets sont inclus dans `assets/audio`. Le premier morceau est fixe, les suivants sont mélangés sans répétition immédiate. Mute global, deux volumes et deux interrupteurs musique/effets sont mémorisés. La musique démarre après une interaction et s'arrête en arrière-plan. Voir [la convention audio](assets/audio/README.md) pour remplacer les WAV par tes MP3 et mettre à jour le manifeste. Aucun titre n'apparaît dans le jeu.
 
-## Données et diagnostic
+## Scores
 
-`mathelio.state.v1` et `mathelio.logs.v1` sont stockés dans localStorage. Rien n’est envoyé à un serveur. Les données sont propres au navigateur **et à l’origine** (protocole, domaine, port) : changer d’adresse ne transfère pas la progression. Effacer les données du navigateur les supprime. Le mode privé peut les rendre temporaires.
+Bonne réponse en défi : 100 points, 0–20 points de vitesse (CM1 seulement), et 0–30 points de combo. Les étoiles valorisent les séances terminées et la précision, pas la rapidité. Les missions rapportent deux étoiles supplémentaires.
 
-Si une sauvegarde est invalide, l’application préserve la valeur existante et ouvre une session temporaire. Si le stockage est inaccessible, le jeu continue en mémoire avec un avertissement. Un changement provenant d’un autre onglet suspend la sauvegarde de l’onglet courant et invite à le recharger.
+L'onglet personnel affiche uniquement les scores du profil actif, avec dix résultats par réglage. Le classement commun garde un meilleur résultat par identité locale, parcours, opération, niveau et table. Le serveur génère les questions, vérifie chaque réponse, calcule le score et mesure le temps actif. Il refuse les réponses rejouées et les parties d'une autre identité. Les sessions expirent après une heure et ne survivent pas au redémarrage du serveur ; les scores validés persistent dans SQLite.
 
-Le journal conserve 200 événements au maximum ; les paramètres des URL HTTP sont retirés. Vérifier les exports avant de les partager. Ce journal est un outil de diagnostic local, pas une surveillance centralisée ni un journal des accès serveur. Il ne peut pas capturer ses propres échecs de chargement. Les scores locaux sont modifiables par l’utilisateur et ne constituent pas un classement sécurisé.
+Le classement n'est pas un système de compétition inviolable : les robots, comptes multiples et calculs pendant une pause restent possibles. Il n'y a ni compte avec mot de passe ni synchronisation de profils entre appareils. La participation publique est désactivée par défaut, activable dans Réglages. Le pseudo, score, précision, durée et date sont publics une fois publiés. Une identité est propre au profil et au navigateur ; son secret n'est jamais exporté avec les profils. Un import crée donc une nouvelle identité si la participation est activée ensuite. Désactiver la participation n'efface pas les résultats déjà publiés.
 
-## Tests
+Une perte de connexion pendant un défi permet de terminer localement. Si la réponse finale a été traitée avant la coupure, le résultat peut déjà être publié ; vérifier le classement commun. Les résultats locaux antérieurs ne sont pas envoyés rétroactivement.
+
+## Sauvegardes et diagnostic
+
+Les clés locales `mathelio.state.v1` (format étendu compatible), `mathelio.preferences.v1`, `mathelio.credentials.v1` et `mathelio.logs.v1` restent propres à l'origine du site. Les anciens profils sont conservés et normalisés. Une sauvegarde illisible ouvre une session temporaire sans écraser les données existantes. Deux onglets modifiant les profils déclenchent un avertissement et bloquent les écritures de l'onglet ancien.
+
+Réglages permet d'exporter tous les profils, puis d'importer un fichier v2 validé de moins de 20 Mo. Les profils sont ajoutés, sans remplacement ; la limite totale reste douze. Les secrets du classement et les préférences sonores ne font pas partie de l'export. Ne partager ce fichier qu'avec une personne autorisée à voir les historiques.
+
+`logs.html` conserve 200 erreurs/avertissements locaux, avec filtre et export. Les requêtes API n'y enregistrent ni pseudo ni réponses. Le serveur journalise ses erreurs dans journald ; Nginx possède ses journaux d'accès et d'erreurs. Rien n'expose les logs système via la page publique.
+
+## Vérifications
 
 ```sh
 npm test
 ```
 
-Tests de génération de calculs, unicité, limites, équilibre, divisions exactes, saisie décimale et points. Aucun téléchargement nécessaire.
+Tests des calculs, niveaux juniors, saisie, score, audio, import, révisions, missions, stockage, authentification des parties, refus des réponses répétées, pauses serveur et persistance SQLite. GitHub Actions vérifie Node 22 et 24, puis la syntaxe des scripts de déploiement.
 
-## Dépôt et hébergement
-
-Le code source est disponible sur [GitHub : Naod6473/Mathelio](https://github.com/Naod6473/Mathelio). Les vérifications automatiques s’exécutent à chaque envoi et pull request. Aucun hébergement de production n’est configuré. Voir `DEPLOIEMENT.md` pour les fichiers à servir et les décisions à prendre concernant LXC/VM et les mises à jour.
+Code : https://github.com/Naod6473/Mathelio
