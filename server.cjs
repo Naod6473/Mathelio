@@ -6,7 +6,7 @@ const {DatabaseSync}=require('node:sqlite');
 const E=require('./engine.js');
 const token=()=>randomBytes(32).toString('hex');
 const hash=s=>createHash('sha256').update(s).digest('hex');
-function configuration(c){if(!c||!['cm1','junior','doom'].includes(c.track)||!Object.hasOwn(E.categories,c.category)||!Object.hasOwn(E.levels,c.level)||!(c.table===''||/^(?:[2-9]|1[0-2])$/.test(c.table)))throw Error('Réglages invalides');return {track:c.track,category:c.track==='doom'?'mix':c.track==='junior'?'add':c.category,level:c.track==='doom'?'hard':c.level,table:c.track==='cm1'&&['mul','div'].includes(c.category)?c.table:'',mode:'challenge',count:10};}
+function configuration(c){if(!c||!['cm1','cm2','junior','doom'].includes(c.track)||!Object.hasOwn(E.categories,c.category)||!Object.hasOwn(E.levels,c.level)||!(c.table===''||/^(?:[2-9]|1[0-2])$/.test(c.table)))throw Error('Réglages invalides');return {track:c.track,category:c.track==='doom'?'mix':c.track==='junior'&&!['add','sub','mix'].includes(c.category)?'add':c.category,level:c.track==='doom'?'hard':c.level,table:['cm1','cm2'].includes(c.track)&&['mul','div'].includes(c.category)?c.table:'',mode:'challenge',count:10};}
 function createApp({dbPath=':memory:',publicDir=__dirname,now=Date.now}={}){
   const db=new DatabaseSync(dbPath);db.exec(`PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;
     CREATE TABLE IF NOT EXISTS players(id TEXT PRIMARY KEY, secret TEXT NOT NULL UNIQUE);

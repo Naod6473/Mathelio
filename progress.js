@@ -10,7 +10,7 @@
     const expected=q.complement?20-q.a:({add:()=>q.a+q.b,sub:()=>q.a-q.b,mul:()=>q.a*q.b,div:()=>q.a/q.b}[q.op]());
     if(Math.abs(expected-q.answer)>1e-8)throw Error('Solution invalide');
     const fmt=n=>String(n).replace('.',',');
-    return {op:q.op,a:q.a,b:q.b,answer:q.answer,track:q.track==='junior'?'junior':'cm1',level:['easy','medium','hard'].includes(q.level)?q.level:(q.complement||!Number.isInteger(q.a)||!Number.isInteger(q.b)?'hard':q.track==='junior'&&q.a+q.b>10?'medium':'easy'),complement:!!q.complement,label:q.complement?`${q.a} + ? = 20`:`${fmt(q.a)} ${{add:'+ ',sub:'− ',mul:'× ',div:'÷ '}[q.op]}${fmt(q.b)}`};
+    return {op:q.op,a:q.a,b:q.b,answer:q.answer,track:['junior','cm2'].includes(q.track)?q.track:'cm1',level:['easy','medium','hard'].includes(q.level)?q.level:(q.complement||!Number.isInteger(q.a)||!Number.isInteger(q.b)?'hard':q.track==='junior'&&q.a+q.b>10?'medium':'easy'),complement:!!q.complement,label:q.complement?`${q.a} + ? = 20`:`${fmt(q.a)} ${{add:'+ ',sub:'− ',mul:'× ',div:'÷ '}[q.op]}${fmt(q.b)}`};
   }
   function cleanProfile(p){
     if(!p||typeof p.id!=='string'||p.id.length>100||typeof p.name!=='string'||!p.name.trim()||p.name.length>24||!integer(p.avatar,5)||!integer(p.stars)||!p.stats||!Array.isArray(p.errors)||p.errors.length>300)throw Error('Profil invalide');
@@ -22,12 +22,12 @@
     for(const op of ops){const v=p.stats.opCorrect?.[op]||0;if(!integer(v))throw Error('Trophée invalide');s.opCorrect[op]=v;}
     const history=Array.isArray(p.history)?p.history.slice(-200).map(h=>{
       if(!h||typeof h.date!=='string'||!Number.isFinite(Date.parse(h.date))||!Array.isArray(h.answers)||h.answers.length>100)throw Error('Historique invalide');
-      return {date:h.date,track:h.track==='junior'?'junior':'cm1',category:ops.includes(h.category)?h.category:'mix',level:['easy','medium','hard'].includes(h.level)?h.level:'easy',answers:h.answers.map(a=>({...cleanQuestion(a),correct:a.correct===true,corrected:a.corrected===true,spaced:a.spaced===true}))};
+      return {date:h.date,track:['junior','cm2'].includes(h.track)?h.track:'cm1',category:ops.includes(h.category)?h.category:'mix',level:['easy','medium','hard'].includes(h.level)?h.level:'easy',answers:h.answers.map(a=>({...cleanQuestion(a),correct:a.correct===true,corrected:a.corrected===true,spaced:a.spaced===true}))};
     }):[];
     const scores=Array.isArray(p.records)?p.records.slice(-1000).map(cleanScore):[];
     return {id:p.id,name:p.name.trim(),avatar:p.avatar,accessory:p.accessory,stars:p.stars,stats:s,badges:Array.isArray(p.badges)?p.badges.filter(x=>typeof x==='string'&&/^[a-z0-9_-]{1,30}$/.test(x)).slice(0,100):[],errors:p.errors.map(cleanQuestion),history,records:scores,mission:cleanMission(p.mission)};
   }
-  function cleanScore(s){if(!s||!integer(s.score,1500)||!integer(s.correct,10)||!Number.isFinite(s.duration)||s.duration<0||s.duration>86400||!['add','sub','mul','div','mix'].includes(s.category)||!['easy','medium','hard'].includes(s.level)||typeof s.date!=='string'||!Number.isFinite(Date.parse(s.date)))throw Error('Record invalide');return {score:s.score,correct:s.correct,duration:s.duration,category:s.category,level:s.level,track:['junior','doom'].includes(s.track)?s.track:'cm1',table:/^(?:[2-9]|1[0-2])$/.test(String(s.table))?String(s.table):'',date:s.date};}
+  function cleanScore(s){if(!s||!integer(s.score,1500)||!integer(s.correct,10)||!Number.isFinite(s.duration)||s.duration<0||s.duration>86400||!['add','sub','mul','div','mix'].includes(s.category)||!['easy','medium','hard'].includes(s.level)||typeof s.date!=='string'||!Number.isFinite(Date.parse(s.date)))throw Error('Record invalide');return {score:s.score,correct:s.correct,duration:s.duration,category:s.category,level:s.level,track:['junior','cm2','doom'].includes(s.track)?s.track:'cm1',table:/^(?:[2-9]|1[0-2])$/.test(String(s.table))?String(s.table):'',date:s.date};}
   const missions=[{id:'practice',title:'Termine une séance d’entraînement',target:1},{id:'correct',title:'Trouve 10 bonnes réponses',target:10},{id:'repair',title:'Corrige 3 calculs à revoir',target:3},{id:'add',title:'Réussis 10 additions',target:10}];
   function cleanMission(m){const def=missions.find(x=>x.id===m?.id)||missions[0];return {...def,progress:integer(m?.progress)?Math.min(def.target,m.progress):0,claimed:m?.claimed===true};}
   function update(p,g){

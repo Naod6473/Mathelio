@@ -67,3 +67,5 @@ npm test
 Tests des calculs, niveaux juniors, saisie, score, audio, import, révisions, missions, stockage, authentification des parties, refus des réponses répétées, pauses serveur et persistance SQLite. GitHub Actions vérifie Node 22 et 24, puis la syntaxe des scripts de déploiement.
 
 Code : https://github.com/Naod6473/Mathelio
+
+Les parcours disponibles sont CP, CM1 et CM2. Le CP propose additions, soustractions sans résultat négatif et un mode mixte équilibré ; au niveau difficile, les additions sont des compléments à 20. Le CM2 propose les quatre opérations et un mode mixte, avec des nombres plus grands, des décimaux au dixième puis au centième et des multiplications à deux chiffres. Les records, bilans et révisions restent séparés par parcours.

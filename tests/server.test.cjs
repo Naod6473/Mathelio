@@ -35,3 +35,18 @@ test('Doom enforces deadline, separates rankings and serves supplied assets',asy
   for(const [file,mime] of [['assets/images/logo.png','image/png'],['assets/audio/doom/doom-01.mp3','audio/mpeg']]){const r=await fetch(base+'/'+file);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),mime);await r.arrayBuffer();}
  }finally{await new Promise(r=>server.close(r));app.close();}
 });
+
+test('shared challenges preserve CP operation choices and separate CM2 scores',async()=>{
+ const app=createApp();const server=http.createServer(app.handler);await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port+'/api/';let token;
+ const call=async(route,data)=>{const r=await fetch(base+route,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});assert.ok(r.ok);return r.json();};
+ try{
+ token=(await call('players',{})).token;
+ for(const [track,category] of [['junior','sub'],['junior','mix'],['cm2','mix']]){
+ const cfg={track,category,level:'hard',table:''};let current=await call('games',{config:cfg,name:'Test parcours'});const id=current.game;const ops=[];
+ for(let i=0;i<10;i++){ops.push(current.question.op);const answer=require('../engine.js').solve(current.question);assert.equal((await call('games/'+id+'/answer',{index:i,value:answer})).correct,true);if(i<9)current=await call('games/'+id+'/next',{index:i});}
+ if(category==='sub')assert.ok(ops.every(op=>op==='sub'));if(track==='junior'&&category==='mix')assert.equal(ops.filter(op=>op==='sub').length,5);
+ const scores=(await call('scores?'+new URLSearchParams(cfg))).scores;assert.equal(scores.length,1);assert.equal(scores[0].correct,10);
+ }
+ assert.equal((await call('scores?'+new URLSearchParams({track:'cm1',category:'mix',level:'hard',table:''}))).scores.length,0);
+ }finally{await new Promise(r=>server.close(r));app.close();}
+});

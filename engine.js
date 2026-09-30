@@ -24,29 +24,50 @@
     }
     return {op,a,b,answer,label:`${fmt(a)} ${{add:'+',sub:'−',mul:'×',div:'÷'}[op]} ${fmt(b)}`};
   }
+  function cm2Question(op,level,table,rng) {
+    const r=(a,b)=>random(a,b,rng);let a,b,answer;
+    const scale=level==='hard'?100:level==='medium'?10:1;
+    if(op==='add'||op==='sub') {
+      a=r(350,level==='easy'?1999:8999);b=r(125,level==='easy'?999:4999);
+      if(op==='sub'&&b>a)[a,b]=[b,a];
+      answer=(op==='add'?a+b:a-b)/scale;a/=scale;b/=scale;
+    } else {
+      a=r(level==='easy'?11:21,level==='hard'?99:49);
+      b=table?Number(table):r(level==='easy'?2:12,level==='hard'?49:25);
+      answer=a*b;if(op==='div'){const product=answer;answer=a;a=product;}
+    }
+    return {op,a,b,answer,label:`${fmt(a)} ${{add:'+',sub:'−',mul:'×',div:'÷'}[op]} ${fmt(b)}`};
+  }
   function generate(config,rng=Math.random) {
     if(config.track==='doom')return generateDoom(rng);
     if(config.track==='junior') {
       const pool=[];
       for(let a=0;a<=19;a++)for(let b=0;b<=9;b++) {
+        if(config.category==='sub'||config.category==='mix') {
+          if(a>=b&&(config.level==='easy'?a<=10:config.level==='medium'?a>=10&&a<=18:a<=19))pool.push({op:'sub',a,b,answer:a-b,label:`${a} − ${b}`,track:'junior'});
+          if(config.category==='sub')continue;
+        }
         if(config.level==='hard') {if(b===0)pool.push({op:'add',a,b:20-a,answer:20-a,complement:true,label:`${a} + ? = 20`,track:'junior'});}
         else if(a<=9&&(config.level==='easy'?a+b<=10:a+b>=10))pool.push({op:'add',a,b,answer:a+b,label:`${a} + ${b}`,track:'junior'});
       }
       for(let i=pool.length-1;i>0;i--){const j=random(0,i,rng);[pool[i],pool[j]]=[pool[j],pool[i]];}
-      return pool.slice(0,config.mode==='challenge'?10:(config.count||5)).map(q=>({...q,level:config.level}));
+      const count=config.mode==='challenge'?10:(config.count||5);
+      const chosen=config.category==='mix'?Array.from({length:count},(_,i)=>pool.filter(q=>q.op===(i%2?'sub':'add'))[Math.floor(i/2)]):pool.slice(0,count);
+      for(let i=chosen.length-1;i>0;i--){const j=random(0,i,rng);[chosen[i],chosen[j]]=[chosen[j],chosen[i]];}
+      return chosen.map(q=>({...q,level:config.level}));
     }
     const result=[],seen=new Set();const ops=['add','sub','mul','div'];
     const count=config.mode==='challenge'?10:(config.count||10);
     const order=config.category==='mix'?Array.from({length:count},(_,i)=>ops[i%4]):Array(count).fill(config.category);
     for(let i=order.length-1;i>0;i--){const j=random(0,i,rng);[order[i],order[j]]=[order[j],order[i]];}
-    for(const op of order){if(config.table&&result.length===10)seen.clear();let q,tries=0;do {q=question(op,config.level,config.table,rng);tries++;}while(seen.has(q.label)&&tries<1000);if(seen.has(q.label))throw new Error('Impossible de générer des questions distinctes');seen.add(q.label);result.push({...q,track:'cm1',level:config.level});}
+    for(const op of order){if(config.table&&result.length===10)seen.clear();let q,tries=0;do {q=(config.track==='cm2'?cm2Question:question)(op,config.level,config.table,rng);tries++;}while(seen.has(q.label)&&tries<1000);if(seen.has(q.label))throw new Error('Impossible de générer des questions distinctes');seen.add(q.label);result.push({...q,track:config.track==='cm2'?'cm2':'cm1',level:config.level});}
     return result;
   }
   function parse(value){const s=String(value).trim();return /^\d{1,6}([,.]\d{1,2})?$/.test(s)?Number(s.replace(',','.')):null;}
   function points(correct,seconds,combo){return correct?100+Math.max(0,20-Math.floor(seconds*2))+Math.min(30,Math.max(0,combo-1)*5):0;}
   function solve(q){
     if(q.track==='doom')return q.numbers.slice(1).reduce((value,n,i)=>q.operators[i]==='add'?value+n:q.operators[i]==='sub'?value-n:value*n,q.numbers[0]);
-    return q.complement?20-q.a:Math.round(({add:()=>q.a+q.b,sub:()=>q.a-q.b,mul:()=>q.a*q.b,div:()=>q.a/q.b}[q.op]())*10)/10;
+    return q.complement?20-q.a:Math.round(({add:()=>q.a+q.b,sub:()=>q.a-q.b,mul:()=>q.a*q.b,div:()=>q.a/q.b}[q.op]())*100)/100;
   }
   function doomLabel(numbers,operators){return numbers.slice(1).reduce((label,n,i)=>`${i?'('+label+')':label} ${{add:'+',sub:'−',mul:'×'}[operators[i]]} ${n}`,String(numbers[0]));}
   function generateDoom(rng){
