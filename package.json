@@ -1,0 +1,7 @@
+{
+  "name": "mathelio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calcul mental CM1, application statique sans dépendance",
+  "scripts": { "start": "node dev-server.cjs", "test": "node --test tests/*.test.cjs" }
+}
