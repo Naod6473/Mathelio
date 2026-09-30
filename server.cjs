@@ -21,7 +21,7 @@ function createApp({dbPath=':memory:',publicDir=__dirname,now=Date.now}={}){
     const url=new URL(req.url,'http://localhost');if(!url.pathname.startsWith('/api/'))return serve(req,res,url.pathname,publicDir);
     clean();const origin=req.headers.origin;if(origin&&origin!==`https://${req.headers.host}`&&origin!==`http://${req.headers.host}`)return reply(res,403,{error:'Origine refusée'});
     const addr=req.socket.remoteAddress||'unknown';const k=hash(addr);const rate=limits.get(k)||{since:now(),count:0};rate.count++;limits.set(k,rate);if(rate.count>300)return reply(res,429,{error:'Trop de requêtes, réessaie dans une minute.'});
-    if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,version:'2.1.0'});
+    if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,version:'2.1.2'});
     if(req.method==='GET'&&url.pathname==='/api/scores'){const cfg=configuration(Object.fromEntries(url.searchParams));const settings=JSON.stringify(cfg);const rows=db.prepare('SELECT name,score,correct,duration,date FROM scores WHERE settings=? ORDER BY score DESC,correct DESC,duration ASC LIMIT 10').all(settings);return reply(res,200,{scores:rows});}
     if(req.method!=='POST')return reply(res,404,{error:'Route inconnue'});
     const data=await body(req);
