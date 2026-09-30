@@ -56,9 +56,11 @@ mv -Tf "$ROOT/current.next" "$ROOT/current"
 systemctl daemon-reload
 systemctl enable mathelio
 systemctl restart mathelio
-curl --retry 8 --retry-connrefused --retry-delay 1 --fail --silent http://127.0.0.1:4319/api/health
+source "$RELEASE/source/deploy/health.sh"
+EXPECTED_VERSION=$(node -p "require('$RELEASE/source/package.json').version")
+wait_health "$EXPECTED_VERSION" http://127.0.0.1:4319/api/health
 systemctl reload nginx
-curl --fail --silent -H 'Host: mathelio.pissits.com' http://127.0.0.1/api/health
+wait_health "$EXPECTED_VERSION" http://127.0.0.1/api/health -H 'Host: mathelio.pissits.com'
 if [[ -n "$OLD" && -f "$OLD/server.cjs" ]]; then ln -sfn "$OLD" "$ROOT/previous"; elif [[ -n "$OLD" ]]; then ln -sfn "$OLD" "$ROOT/legacy-v1"; fi
 printf '%s SUCCESS %s\n' "$(date -Is)" "$COMMIT" >> /var/log/mathelio-deploy.log
 echo "Mathélio mis à jour : $COMMIT"

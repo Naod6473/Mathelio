@@ -17,4 +17,4 @@ jobs:
           node-version: ${{ matrix.node }}
       - run: npm test
       - run: node --check script.js && node --check engine.js && node --check diagnostics.js && node --check logs.js && node --check progress.js && node --check audio.js && node --check server.cjs
-      - run: bash -n deploy/update.sh && bash -n deploy/rollback.sh
+      - run: bash -n deploy/update.sh && bash -n deploy/rollback.sh && bash -n deploy/health.sh
