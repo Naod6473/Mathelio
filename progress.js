@@ -27,10 +27,11 @@
     const scores=Array.isArray(p.records)?p.records.slice(-1000).map(cleanScore):[];
     return {id:p.id,name:p.name.trim(),avatar:p.avatar,accessory:p.accessory,stars:p.stars,stats:s,badges:Array.isArray(p.badges)?p.badges.filter(x=>typeof x==='string'&&/^[a-z0-9_-]{1,30}$/.test(x)).slice(0,100):[],errors:p.errors.map(cleanQuestion),history,records:scores,mission:cleanMission(p.mission)};
   }
-  function cleanScore(s){if(!s||!integer(s.score,1500)||!integer(s.correct,10)||!Number.isFinite(s.duration)||s.duration<0||s.duration>86400||!['add','sub','mul','div','mix'].includes(s.category)||!['easy','medium','hard'].includes(s.level)||typeof s.date!=='string'||!Number.isFinite(Date.parse(s.date)))throw Error('Record invalide');return {score:s.score,correct:s.correct,duration:s.duration,category:s.category,level:s.level,track:s.track==='junior'?'junior':'cm1',table:/^(?:[2-9]|1[0-2])$/.test(String(s.table))?String(s.table):'',date:s.date};}
+  function cleanScore(s){if(!s||!integer(s.score,1500)||!integer(s.correct,10)||!Number.isFinite(s.duration)||s.duration<0||s.duration>86400||!['add','sub','mul','div','mix'].includes(s.category)||!['easy','medium','hard'].includes(s.level)||typeof s.date!=='string'||!Number.isFinite(Date.parse(s.date)))throw Error('Record invalide');return {score:s.score,correct:s.correct,duration:s.duration,category:s.category,level:s.level,track:['junior','doom'].includes(s.track)?s.track:'cm1',table:/^(?:[2-9]|1[0-2])$/.test(String(s.table))?String(s.table):'',date:s.date};}
   const missions=[{id:'practice',title:'Termine une séance d’entraînement',target:1},{id:'correct',title:'Trouve 10 bonnes réponses',target:10},{id:'repair',title:'Corrige 3 calculs à revoir',target:3},{id:'add',title:'Réussis 10 additions',target:10}];
   function cleanMission(m){const def=missions.find(x=>x.id===m?.id)||missions[0];return {...def,progress:integer(m?.progress)?Math.min(def.target,m.progress):0,claimed:m?.claimed===true};}
   function update(p,g){
+    if(g.config.track==='doom')return {correct:g.answers.filter(a=>a.correct).length,total:g.answers.length,repaired:0};
     const s=p.stats;const base=g.answers.filter(a=>!a.spaced);const correct=base.filter(a=>a.correct).length;
     s.sessions++;s.correct+=correct;s.opCorrect??={add:0,sub:0,mul:0,div:0};for(const a of base)if(a.correct)s.opCorrect[a.op]++;s.bestStreak=Math.max(s.bestStreak,g.maxCombo);if(g.config.track==='junior')s.junior++;
     const day=new Date().toLocaleDateString('sv-SE');if(!s.days.includes(day))s.days.push(day);

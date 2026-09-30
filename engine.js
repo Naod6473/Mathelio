@@ -25,6 +25,7 @@
     return {op,a,b,answer,label:`${fmt(a)} ${{add:'+',sub:'−',mul:'×',div:'÷'}[op]} ${fmt(b)}`};
   }
   function generate(config,rng=Math.random) {
+    if(config.track==='doom')return generateDoom(rng);
     if(config.track==='junior') {
       const pool=[];
       for(let a=0;a<=19;a++)for(let b=0;b<=9;b++) {
@@ -43,5 +44,28 @@
   }
   function parse(value){const s=String(value).trim();return /^\d{1,6}([,.]\d{1,2})?$/.test(s)?Number(s.replace(',','.')):null;}
   function points(correct,seconds,combo){return correct?100+Math.max(0,20-Math.floor(seconds*2))+Math.min(30,Math.max(0,combo-1)*5):0;}
-  const api={categories,levels,fmt,generate,parse,points};root.MathEngine=api;if(typeof module!=='undefined')module.exports=api;
+  function solve(q){
+    if(q.track==='doom')return q.numbers.slice(1).reduce((value,n,i)=>q.operators[i]==='add'?value+n:q.operators[i]==='sub'?value-n:value*n,q.numbers[0]);
+    return q.complement?20-q.a:Math.round(({add:()=>q.a+q.b,sub:()=>q.a-q.b,mul:()=>q.a*q.b,div:()=>q.a/q.b}[q.op]())*10)/10;
+  }
+  function doomLabel(numbers,operators){return numbers.slice(1).reduce((label,n,i)=>`${i?'('+label+')':label} ${{add:'+',sub:'−',mul:'×'}[operators[i]]} ${n}`,String(numbers[0]));}
+  function generateDoom(rng){
+    const r=(a,b)=>random(a,b,rng),questions=[],seen=new Set();
+    for(const kind of ['add','sub','mul','mix','add','sub','mul','mix','add','mix']){
+      let q;
+      for(let tries=0;tries<1000;tries++){
+        let numbers,operators;
+        if(kind==='add'){numbers=Array.from({length:r(2,5)},()=>r(137,2987));operators=Array(numbers.length-1).fill('add');}
+        else if(kind==='sub'){numbers=[r(6000,9999),...Array.from({length:r(1,4)},()=>r(117,999))];operators=Array(numbers.length-1).fill('sub');}
+        else if(kind==='mul'){numbers=[r(23,97),r(12,89)];if(r(0,1))numbers.push(r(2,5));operators=Array(numbers.length-1).fill('mul');}
+        else {numbers=[r(31,89),r(12,49),r(127,899)];operators=['mul','add'];if(r(0,1)){numbers.push(r(51,199));operators.push('sub');}if(r(0,1)){numbers.push(r(2,3));operators.push('mul');}}
+        q={track:'doom',level:'hard',op:kind==='mix'?'mul':kind,numbers,operators,label:doomLabel(numbers,operators)};q.answer=solve(q);
+        if(!seen.has(q.label))break;
+      }
+      if(seen.has(q.label))throw Error('Impossible de générer le défi Doom');seen.add(q.label);questions.push(q);
+    }
+    for(let i=questions.length-1;i>0;i--){const j=r(0,i);[questions[i],questions[j]]=[questions[j],questions[i]];}
+    return questions;
+  }
+  const api={categories,levels,fmt,generate,parse,points,solve,doomLabel};root.MathEngine=api;if(typeof module!=='undefined')module.exports=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

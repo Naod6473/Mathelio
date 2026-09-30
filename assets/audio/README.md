@@ -1,13 +1,18 @@
 # Audio Mathélio
 
-Les WAV fournis sont de courtes mélodies et effets synthétisés pour cette application, sans échantillon externe. Leur générateur reproductible est `tools/generate-audio.py`.
+Les fichiers fournis sont enregistrés dans les dossiers suivants :
 
-Le navigateur démarre la musique au premier toucher ou à la première touche. `launch.wav` passe une fois à chaque ouverture, puis les morceaux de fond sont mélangés sans répétition immédiate lorsqu’au moins deux sont disponibles. La musique est suspendue quand la page est masquée. Les réglages et le mute sont mémorisés par navigateur.
+- `music/launch.mp3` : premier morceau à chaque ouverture, après la première interaction autorisant le son.
+- `music/background-01.mp3` à `background-06.mp3` : musique du jeu normal. Chaque nouvelle partie choisit un morceau aléatoire parmi ces fichiers et `launch.mp3`, sans répétition immédiate. La lecture continue avec une liste mélangée.
+- `doom/doombackground.mp3` : musique en boucle dès le démarrage d’une partie Doom.
+- `doom/doom-01.mp3` : validation de chaque question Doom, juste, fausse ou expirée.
+- `sfx/click.mp3`, `sfx/error.mp3` : clic et erreur du jeu normal.
+- `sfx/succes-01.mp3` à `succes-03.mp3` : bonne réponse normale, variante aléatoire.
+- `sfx/victory-01.mp3` et `victory-02.mp3` : chaque partie terminée, variante aléatoire.
+- `sfx/badge-01.mp3` et `badge-02.mp3` : récompense obtenue, variante aléatoire après le son de fin.
 
-## Remplacer les sons
+Les chemins complets sont déclarés dans `manifest.json`, depuis `assets/audio/`. Conserver l’orthographe `succes` des fichiers. Aucun titre musical n’est affiché. Les noms acceptent minuscules, chiffres et tirets ; formats MP3, WAV ou OGG.
 
-Déposer les fichiers dans `assets/audio/music/` ou `assets/audio/sfx/`, puis modifier `manifest.json`. Les noms utilisent des minuscules, chiffres et tirets. Formats acceptés : `.mp3`, `.wav`, `.ogg`.
+Mute global, volumes et interrupteurs musique/effets sont mémorisés. La musique s’arrête lorsque l’onglet est masqué. En quittant Doom, la musique normale reprend. Un fichier manquant est signalé dans le diagnostic sans bloquer le jeu.
 
-Convention conseillée : `music/launch.mp3`, `music/background-01.mp3`, `music/background-02.mp3`, `sfx/click-01.mp3`, `sfx/success-01.mp3`, `sfx/error-01.mp3`, `sfx/badge-01.mp3`, `sfx/finish-01.mp3`. Les chemins du manifeste commencent par `assets/audio/`. Plusieurs variantes peuvent être indiquées dans chaque liste d’effets. Aucun titre musical n’est affiché dans le jeu.
-
-Les fichiers doivent être ajoutés au dépôt pour être déployés. Utiliser des fichiers dont la diffusion publique est autorisée. Un fichier musical manquant est ignoré et enregistré dans le diagnostic, sans bloquer la partie.
+Le logo se trouve dans `assets/images/logo.png`, à côté du texte Mathélio dans l’en-tête. Ajouter les fichiers au dépôt pour les inclure dans les mises à jour.

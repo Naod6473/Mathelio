@@ -1,4 +1,4 @@
-# Mathélio · version 2
+# Mathélio · version 2.1
 
 Application de calcul mental en HTML/CSS/JavaScript natifs. Le jeu personnel reste utilisable sur un serveur statique, sans compilation ni dépendance front-end. Le classement commun facultatif utilise Node.js 22.13 minimum et SQLite intégrée, sans paquet npm externe.
 
@@ -28,13 +28,21 @@ Application et classement persistant sur http://127.0.0.1:4319 ; base `data/math
 - Bilan parent : précision par opération, tables sous 80 %, dix dernières séances, filtre par parcours. Historique limité aux 200 dernières séances depuis la v2. Ce bilan n'est pas protégé par un mot de passe.
 - Après trois séances comparables, suggestion de difficulté supérieure à partir de 90 % de réussite, ou inférieure sous 50 %. Le joueur doit accepter la suggestion.
 
+## Mode secret Doom
+
+Cliquer cinq fois sur le logo, avec moins de deux secondes entre deux clics, ouvre le défi pour les parents. Un profil doit être sélectionné. Dix calculs distincts comportent deux à cinq nombres, avec additions, soustractions et multiplications. Les parenthèses précisent l’ordre des opérations.
+
+Chaque question dispose de 30 secondes, sans pause, même si l’onglet est masqué. Une réponse hors délai rapporte zéro point et révèle la correction. La correction est exclue du temps de réponse ; elle peut être mise en pause. Le passage automatique après cinq secondes reste désactivable et le bouton manuel reste disponible.
+
+Les records Doom sont séparés dans les classements personnel et commun. Ces parties ne modifient ni les étoiles, ni les missions, ni le bilan parent de l’enfant. Le classement commun vérifie aussi le délai côté serveur.
+
 ## Musique
 
-Des motifs synthétisés originaux et des effets sont inclus dans `assets/audio`. Le premier morceau est fixe, les suivants sont mélangés sans répétition immédiate. Mute global, deux volumes et deux interrupteurs musique/effets sont mémorisés. La musique démarre après une interaction et s'arrête en arrière-plan. Voir [la convention audio](assets/audio/README.md) pour remplacer les WAV par tes MP3 et mettre à jour le manifeste. Aucun titre n'apparaît dans le jeu.
+Les MP3 fournis sont inclus dans `assets/audio`. `launch.mp3` ouvre le jeu ; chaque partie normale choisit ensuite un morceau parmi launch et les six backgrounds, sans répétition immédiate. Doom possède sa musique en boucle et son effet de validation. Une variante de victory joue à chaque fin de partie, suivie de badge si une récompense est obtenue. Mute global, deux volumes et deux interrupteurs musique/effets sont mémorisés. La musique démarre après une interaction et s'arrête en arrière-plan. Voir [la convention audio](assets/audio/README.md) pour les chemins et les règles de lecture. Aucun titre n'apparaît dans le jeu.
 
 ## Scores
 
-Bonne réponse en défi : 100 points, 0–20 points de vitesse (CM1 seulement), et 0–30 points de combo. Les étoiles valorisent les séances terminées et la précision, pas la rapidité. Les missions rapportent deux étoiles supplémentaires.
+Bonne réponse en défi : 100 points, 0–20 points de vitesse (CM1 et Doom), et 0–30 points de combo. Les étoiles valorisent les séances terminées et la précision, pas la rapidité. Les missions rapportent deux étoiles supplémentaires.
 
 L'onglet personnel affiche uniquement les scores du profil actif, avec dix résultats par réglage. Le classement commun garde un meilleur résultat par identité locale, parcours, opération, niveau et table. Le serveur génère les questions, vérifie chaque réponse, calcule le score et mesure le temps actif. Il refuse les réponses rejouées et les parties d'une autre identité. Les sessions expirent après une heure et ne survivent pas au redémarrage du serveur ; les scores validés persistent dans SQLite.
 

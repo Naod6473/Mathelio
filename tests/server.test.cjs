@@ -18,3 +18,20 @@ test('shared leaderboard computes scores, enforces ownership and survives restar
  }finally{await new Promise(r=>server.close(r));app.close();}
  const reopened=createApp({dbPath});assert.equal(reopened.db.prepare('SELECT count(*) as n FROM scores').get().n,1);reopened.close();fs.rmSync(dir,{recursive:true});
 });
+
+test('Doom enforces deadline, separates rankings and serves supplied assets',async()=>{
+ let clock=1000000;const app=createApp({now:()=>clock});const server=http.createServer(app.handler);await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;let token;
+ const call=async(route,data)=>{const r=await fetch(base+'/api/'+route,{method:data?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});return {status:r.status,body:await r.json()};};
+ try{
+  token=(await call('players',{})).body.token;const cfg={track:'doom',category:'mix',level:'hard',table:''};let current=(await call('games',{config:cfg,name:'Parent test'})).body;const id=current.game;
+  assert.equal((await call('games/'+id+'/pause',{index:0})).status,409);
+  for(let i=0;i<10;i++){
+   const answer=require('../engine.js').solve(current.question);clock+=i===0?30000:1000;
+   const result=await call('games/'+id+'/answer',{index:i,value:i===1?null:answer});assert.equal(result.status,200);assert.equal(result.body.correct,i>1);assert.equal(result.body.timedOut,i<2);if(i<2)assert.equal(result.body.gain,0);
+   if(i<9){assert.equal((await call('games/'+id+'/answer',{index:i,value:answer})).status,409);current=(await call('games/'+id+'/next',{index:i})).body;}
+  }
+  assert.equal((await call('scores?'+new URLSearchParams(cfg))).body.scores[0].correct,8);
+  assert.equal((await call('scores?'+new URLSearchParams({...cfg,track:'cm1'}))).body.scores.length,0);
+  for(const [file,mime] of [['assets/images/logo.png','image/png'],['assets/audio/doom/doom-01.mp3','audio/mpeg']]){const r=await fetch(base+'/'+file);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),mime);await r.arrayBuffer();}
+ }finally{await new Promise(r=>server.close(r));app.close();}
+});

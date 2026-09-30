@@ -1,13 +1,38 @@
 {
   "music": {
-    "launch": "assets/audio/music/launch.wav",
-    "background": ["assets/audio/music/background-01.wav", "assets/audio/music/background-02.wav"]
+    "launch": "assets/audio/music/launch.mp3",
+    "background": [
+      "assets/audio/music/background-01.mp3",
+      "assets/audio/music/background-02.mp3",
+      "assets/audio/music/background-03.mp3",
+      "assets/audio/music/background-04.mp3",
+      "assets/audio/music/background-05.mp3",
+      "assets/audio/music/background-06.mp3"
+    ],
+    "doom": "assets/audio/doom/doombackground.mp3"
   },
   "sfx": {
-    "click": ["assets/audio/sfx/click-01.wav"],
-    "success": ["assets/audio/sfx/success-01.wav"],
-    "error": ["assets/audio/sfx/error-01.wav"],
-    "badge": ["assets/audio/sfx/badge-01.wav"],
-    "finish": ["assets/audio/sfx/finish-01.wav"]
+    "click": [
+      "assets/audio/sfx/click.mp3"
+    ],
+    "error": [
+      "assets/audio/sfx/error.mp3"
+    ],
+    "success": [
+      "assets/audio/sfx/succes-01.mp3",
+      "assets/audio/sfx/succes-02.mp3",
+      "assets/audio/sfx/succes-03.mp3"
+    ],
+    "badge": [
+      "assets/audio/sfx/badge-01.mp3",
+      "assets/audio/sfx/badge-02.mp3"
+    ],
+    "victory": [
+      "assets/audio/sfx/victory-01.mp3",
+      "assets/audio/sfx/victory-02.mp3"
+    ],
+    "doom": [
+      "assets/audio/doom/doom-01.mp3"
+    ]
   }
 }
