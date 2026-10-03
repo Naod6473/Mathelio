@@ -1,0 +1,14 @@
+[Unit]
+Description=Synchroniser et deployer Mathelio depuis GitHub
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/mathelio
+Environment=GIT_TERMINAL_PROMPT=0
+ExecStart=/bin/bash /usr/local/sbin/mathelio-auto-sync
+# Do not terminate a deployment halfway through a service/configuration change.
+TimeoutStartSec=infinity
+UMask=0022

@@ -71,6 +71,39 @@ Ce retour arrière conserve la base de données courante. Pour une future migrat
 
 Les répertoires de versions ne sont pas supprimés automatiquement. Surveiller leur taille et conserver les versions nécessaires au retour arrière. Les scripts sont vérifiés syntaxiquement et les tests API tournent sur Windows/Linux via CI ; le premier lancement systemd/Nginx doit encore être vérifié sur le LXC réel.
 
+## Synchronisation automatique de GitHub
+
+Après l’installation de Mathélio, activer dans le LXC :
+
+```bash
+cd /opt/mathelio
+git pull --ff-only origin main
+bash deploy/install-auto-sync.sh
+systemctl start mathelio-sync.service
+systemctl list-timers mathelio-sync.timer
+```
+
+Le timer vérifie `origin/main` toutes les cinq minutes et après le démarrage du LXC. Si le commit correspond à la version actuellement servie, rien ne redémarre. Sinon, il utilise le script `deploy/update.sh` du commit récupéré, avec tests locaux, sauvegarde SQLite, bascule de version et contrôles de santé. Il ne dépend pas du résultat GitHub Actions : ce sont les tests exécutés dans le LXC qui conditionnent le déploiement. Aucun `git pull` ou `git reset` n’est effectué par la synchronisation et le code de travail dans `/opt/mathelio` reste inchangé.
+
+Les changements publiés sur `main` seront mis en ligne automatiquement ; les parties communes en cours peuvent être interrompues par le redémarrage du service. Les identifiants Git nécessaires à un dépôt privé doivent être disponibles pour root sans interaction. En cas d’échec, consulter les journaux : le timer réessaiera au prochain passage. Les répertoires de versions et sauvegardes s’accumulent comme lors d’un déploiement manuel ; surveiller le disque.
+
+```bash
+# Journaux et état
+journalctl -u mathelio-sync.service -n 80 --no-pager
+systemctl status mathelio-sync.timer
+
+# Suspendre avant un retour arrière manuel, sinon main sera redéployé
+systemctl disable --now mathelio-sync.timer
+# Si une synchronisation est encore active, attendre sa fin avant rollback
+systemctl is-active mathelio-sync.service
+bash /opt/mathelio/deploy/rollback.sh
+
+# Réactiver
+systemctl enable --now mathelio-sync.timer
+```
+
+Une mise à jour des fichiers du timer ou du synchroniseur lui-même nécessite de relancer `install-auto-sync.sh` depuis le dépôt à jour. Le déploiement automatique ne remplace pas ces fichiers système.
+
 ## Données et journaux
 
 - Base : `/var/lib/mathelio/mathelio.sqlite`, inaccessible depuis Nginx.
