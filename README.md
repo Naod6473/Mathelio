@@ -18,6 +18,14 @@ Application et classement persistant sur http://127.0.0.1:4319 ; base `data/math
 
 ## Jouer
 
+### La guerre des champs
+
+Accessible depuis l’accueil ou `fields.html`. Deux joueurs sur le même écran ou un joueur contre l’ordinateur, sur une grille de 23 × 15 avec deux fermes et un arbre central. Les deux dés définissent les dimensions du rectangle, que l’on peut tourner. Le joueur choisit un emplacement puis calcule l’aire avant de valider. Un indice propose un emplacement légal.
+
+Les champs se touchent par un côté, sans chevauchement ni occupation des fermes ou de l’arbre. Deux tours bloqués consécutifs terminent la partie ; un placement remet ce compteur à zéro. Cette précision et le contact par un côté explicitent les règles papier. Les trois critères A/P/R rapportent chacun un point, aux deux joueurs en cas d’égalité. P est la somme des périmètres de chaque rectangle. Les scores peuvent être calculés par les enfants, avec correction, ou affichés directement.
+
+Les parties restent temporaires dans cette page et ne modifient ni les profils ni le classement commun. L’ordinateur suit les mêmes règles et privilégie une progression vers le centre.
+
 - Parcours CM1 : quatre opérations, mélange équilibré, trois difficultés et tables spécifiques.
 - Petits explorateurs (5–6 ans) : chiffres et somme ≤ 10 ; chiffres et somme de 10 à 18 ; compléments à 20. Aide visuelle par points. Aucun bonus de rapidité ni chronomètre affiché dans ce parcours.
 - Entraînement de 5, 10 ou 20 questions ; défis classés de 10 questions. Une table spécifique contient dix calculs distincts : une séance de vingt questions comprend deux passages.

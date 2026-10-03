@@ -21,7 +21,7 @@ function createApp({dbPath=':memory:',publicDir=__dirname,now=Date.now}={}){
     const url=new URL(req.url,'http://localhost');if(!url.pathname.startsWith('/api/'))return serve(req,res,url.pathname,publicDir);
     clean();const origin=req.headers.origin;if(origin&&origin!==`https://${req.headers.host}`&&origin!==`http://${req.headers.host}`)return reply(res,403,{error:'Origine refusée'});
     const addr=req.socket.remoteAddress||'unknown';const k=hash(addr);const rate=limits.get(k)||{since:now(),count:0};rate.count++;limits.set(k,rate);if(rate.count>300)return reply(res,429,{error:'Trop de requêtes, réessaie dans une minute.'});
-    if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,version:'2.1.2'});
+    if(req.method==='GET'&&url.pathname==='/api/health')return reply(res,200,{ok:true,version:'2.1.3'});
     if(req.method==='GET'&&url.pathname==='/api/scores'){const cfg=configuration(Object.fromEntries(url.searchParams));const settings=JSON.stringify(cfg);const rows=db.prepare('SELECT name,score,correct,duration,date FROM scores WHERE settings=? ORDER BY score DESC,correct DESC,duration ASC LIMIT 10').all(settings);return reply(res,200,{scores:rows});}
     if(req.method!=='POST')return reply(res,404,{error:'Route inconnue'});
     const data=await body(req);
@@ -46,7 +46,7 @@ function createApp({dbPath=':memory:',publicDir=__dirname,now=Date.now}={}){
   }catch(e){if(!res.headersSent){if(e instanceof SyntaxError||/invalid|attendu|volumineuse/i.test(e.message))reply(res,400,{error:e.message});else{console.error(new Date().toISOString(),'API error:',e.message);reply(res,500,{error:'Erreur du serveur. Réessaie plus tard.'});}}else res.end();}}
   return {handler,close:()=>db.close(),db};
 }
-const publicFiles=new Set(['index.html','style.css','script.js','engine.js','progress.js','audio.js','diagnostics.js','logs.html','logs.js','favicon.svg','assets/images/logo.png']);
+const publicFiles=new Set(['index.html','style.css','script.js','engine.js','progress.js','audio.js','diagnostics.js','logs.html','logs.js','favicon.svg','fields.html','fields.css','fields.js','fields-engine.js','assets/images/logo.png']);
 function serve(req,res,pathname,root){const file=pathname==='/'?'index.html':pathname.slice(1);if(!['GET','HEAD'].includes(req.method)||(!publicFiles.has(file)&&!/^assets\/audio\/(manifest\.json|(?:music|sfx|doom)\/[a-z0-9-]+\.(mp3|wav|ogg))$/.test(file))){res.writeHead(404);res.end();return;}fs.readFile(path.join(root,file),(err,data)=>{if(err){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':({'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.json':'application/json','.wav':'audio/wav','.mp3':'audio/mpeg','.ogg':'audio/ogg'})[path.extname(file)],'Cache-Control':'no-cache','X-Content-Type-Options':'nosniff'});res.end(req.method==='HEAD'?undefined:data);});}
 if(require.main===module){const dbPath=process.env.MATHELIO_DB||path.join(__dirname,'data','mathelio.sqlite');fs.mkdirSync(path.dirname(dbPath),{recursive:true});const app=createApp({dbPath,publicDir:process.env.MATHELIO_PUBLIC||__dirname});const server=http.createServer(app.handler);server.requestTimeout=15000;server.headersTimeout=10000;server.listen(Number(process.env.PORT||4319),'127.0.0.1',()=>console.log('Mathélio v2 : http://127.0.0.1:'+(process.env.PORT||4319)));process.on('SIGTERM',()=>server.close(()=>{app.close();process.exit(0);}));}
 module.exports={createApp,configuration,serve};

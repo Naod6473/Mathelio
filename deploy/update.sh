@@ -16,7 +16,7 @@ RELEASE="$ROOT/releases/${COMMIT}-$(date +%s)"
 install -d "$RELEASE/source" "$RELEASE/public"
 git -C "$REPO" archive "$COMMIT" | tar -x -C "$RELEASE/source"
 (cd "$RELEASE/source" && npm test)
-for file in index.html style.css script.js engine.js progress.js audio.js diagnostics.js logs.html logs.js favicon.svg; do
+for file in index.html style.css script.js engine.js progress.js audio.js diagnostics.js logs.html logs.js favicon.svg fields.html fields.css fields.js fields-engine.js; do
     install -m 644 "$RELEASE/source/$file" "$RELEASE/public/$file"
 done
 cp -r "$RELEASE/source/assets" "$RELEASE/public/assets"

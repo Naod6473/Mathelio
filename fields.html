@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="theme-color" content="#28235b"><title>La guerre des champs · Mathélio</title>
+ <link rel="icon" href="favicon.svg" type="image/svg+xml">
+ <link rel="stylesheet" href="style.css?v=2.1.3"><link rel="stylesheet" href="fields.css?v=2.1.3">
+ <script src="fields-engine.js?v=2.1.3" defer></script><script src="fields.js?v=2.1.3" defer></script>
+</head>
+<body>
+ <header class="topbar"><div class="brand"><img class="app-logo" src="assets/images/logo.png" width="52" height="52" alt=""><a href="index.html">Mathélio<span class="brand-dot">.</span></a></div><a href="index.html">Retour au jeu</a></header>
+ <main>
+  <p class="eyebrow">Dés, stratégie et géométrie</p><h1>La guerre des champs</h1><p class="subtitle">Agrandis ta ferme, un rectangle à la fois.</p>
+  <section id="setup" class="panel fields-setup">
+   <h2>Qui cultive avec toi ?</h2>
+   <form id="setup-form"><div class="formrow">
+    <label>Mode de jeu<select id="opponent"><option value="local">Deux joueurs sur cet écran</option><option value="computer">Contre l’ordinateur</option></select></label>
+    <label>Joueur rouge<input id="name-red" maxlength="24" value="Joueur 1" required></label>
+    <label id="blue-label">Joueur bleu<input id="name-blue" maxlength="24" value="Joueur 2" required></label>
+   </div><button class="primary" type="submit">Commencer la partie</button></form>
+  </section>
+  <details class="panel fields-rules"><summary>Comment jouer ?</summary>
+   <p>Chaque joueur part de sa ferme. Lance les deux dés : ils donnent la largeur et la hauteur de ton champ. Tu peux tourner le rectangle. Choisis sa case en haut à gauche, calcule son aire, puis confirme.</p>
+   <p>Le premier champ touche ta ferme. Les suivants touchent au moins un de tes champs par un côté. Les champs ne se chevauchent pas et ne recouvrent ni les fermes ni l’arbre. Un coin seul ne suffit pas.</p>
+   <p>Si aucun placement n’est possible avec les dés, passe ton tour. Deux tours bloqués consécutifs terminent la partie. Un placement réussi remet ce compteur à zéro.</p>
+   <p>À la fin, calcule ton score : <strong>A</strong>, aire totale ; <strong>P</strong>, somme des périmètres de tes rectangles (les côtés partagés sont comptés pour chaque rectangle) ; <strong>R</strong>, aire du plus grand rectangle. Chaque critère rapporte un point au meilleur résultat. En cas d’égalité, chacun marque un point.</p>
+  </details>
+  <section id="match" hidden>
+   <div id="players" class="fields-players"></div>
+   <div class="fields-layout"><section class="panel fields-board-panel"><div id="board" class="fields-board" role="group" aria-label="Plateau de 23 colonnes et 15 lignes"></div><p class="muted fields-caption">⌂ Fermes · 🌳 Arbre · Clique la case en haut à gauche de ton rectangle. Flèches pour naviguer au clavier, Entrée pour choisir.</p></section>
+    <aside class="panel fields-controls"><h2 id="turn-title"></h2><p id="status" role="status" aria-live="polite"></p>
+     <div id="dice" class="fields-dice" aria-label="Dés non lancés"><span>?</span><span>?</span></div>
+     <div class="fields-buttons"><button id="roll" class="primary">Lancer les dés</button><button id="rotate" disabled>Tourner ↻</button><button id="hint" disabled>Montrer un emplacement</button><button id="pass" disabled>Passer mon tour</button></div>
+     <form id="area-form" hidden><label>Quelle est l’aire de ce champ ?<input id="area" type="number" min="1" max="36" inputmode="numeric" required></label><p id="area-help" class="muted"></p><button id="confirm" class="primary" type="submit">Valider le champ</button></form>
+     <p id="feedback" role="status" aria-live="polite"></p><button id="restart" class="spaced">Nouvelle partie</button>
+    </aside></div>
+   <section id="results" class="panel spaced" hidden></section>
+  </section>
+ </main><footer><span>Mathélio · Aire, périmètre et stratégie</span><span>Partie locale, sans classement commun</span></footer>
+</body></html>

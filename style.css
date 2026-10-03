@@ -13,3 +13,5 @@ main:focus{outline:none}
 #answer-form .answer{display:block}
 .app-logo{max-width:52px;max-height:52px;flex-shrink:0}
 #secret-logo{flex:0 0 auto}
+
+.fields-nav{display:inline-flex;align-items:center;text-decoration:none;padding:11px 13px;font-size:15px;border-radius:14px;background:#eeeafa}.fields-home-card{display:flex;gap:20px;align-items:center;justify-content:space-between;margin-bottom:24px;background:#f2f7e9}.fields-home-card h2{margin-bottom:8px}.fields-home-card p{margin:0;color:var(--muted)}.fields-link{display:inline-block;text-decoration:none;padding:14px 20px;border-radius:14px;white-space:nowrap}@media(max-width:650px){.fields-home-card{align-items:start;flex-direction:column}.fields-nav{font-size:13px;padding:10px}}
