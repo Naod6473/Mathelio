@@ -19,3 +19,5 @@ jobs:
       - run: node --check script.js && node --check engine.js && node --check diagnostics.js && node --check logs.js && node --check progress.js && node --check audio.js && node --check server.cjs
       - run: for file in deploy/*.sh; do bash -n "$file" || exit 1; done
       - run: node --check fields-engine.js && node --check fields.js
+      - run: node --check number-display.js
+      - run: node --check learning.js

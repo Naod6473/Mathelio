@@ -5,7 +5,7 @@
  let game=null,names=[],computer=false,selection=null,rotated=false,busy=false,timer=null,calculating=0;
  const aiTurn=()=>computer&&game?.turn===1;
  const rectangle=(x,y)=>({x,y,w:game.dice[rotated?1:0],h:game.dice[rotated?0:1]});
- function overlay(r,classes,text,title){const el=document.createElement('div');el.className='field-overlay '+classes;el.style.cssText=`left:${r.x/E.WIDTH*100}%;top:${r.y/E.HEIGHT*100}%;width:${r.w/E.WIDTH*100}%;height:${r.h/E.HEIGHT*100}%`;el.textContent=text;el.title=title;el.setAttribute('aria-hidden','true');board.append(el);}
+ function overlay(r,classes,text,title){const el=document.createElement('div');el.className='field-overlay '+classes;el.style.cssText=`left:${r.x/E.WIDTH*100}%;top:${r.y/E.HEIGHT*100}%;width:${r.w/E.WIDTH*100}%;height:${r.h/E.HEIGHT*100}%`;el.innerHTML=NumberDisplay.html(text,{...NumberDisplay.prefs,labels:false});el.title=title;el.setAttribute('aria-hidden','true');board.append(el);}
  function draw(){
   board.replaceChildren();
   for(let y=0;y<E.HEIGHT;y++)for(let x=0;x<E.WIDTH;x++){
@@ -33,12 +33,17 @@
   const glyphs=['⚀','⚁','⚂','⚃','⚄','⚅'];$('#dice').innerHTML=game.dice?game.dice.map(n=>`<span aria-hidden="true">${glyphs[n-1]}</span>`).join(''):'<span>?</span><span>?</span>';
   $('#dice').setAttribute('aria-label',game.dice?`Dés : ${game.dice.join(' et ')}`:'Dés non lancés');
   const totals=E.totals(game);$('#players').innerHTML=names.map((n,p)=>`<article class="fields-player ${p===0?'red':'blue'} ${!game.finished&&game.turn===p?'active':''}"><strong>${p===0?'Rouge':'Bleu'} · ${escape(n)}</strong><p>${totals[p].count} champ${totals[p].count>1?'s':''}</p></article>`).join('');
+  NumberDisplay.decorate($('#status'));MathLearning.apply();
+  if(game.dice&&!game.finished&&!aiTurn()){
+   const q={a:game.dice[0],b:game.dice[1],op:'mul',track:'cm1'};
+   $('#fields-learning-tools').innerHTML=MathLearning.toolsHtml(q);MathLearning.bindTools($('#fields-learning-tools'),q);
+  }else $('#fields-learning-tools').replaceChildren();
  }
  function choose(r){
   if(!game?.dice||busy||aiTurn()||game.finished)return;
   if(!E.valid(game,r)){selection=null;preview(r);$('#area-form').hidden=true;$('#feedback').textContent='Ce champ doit toucher ton territoire par un côté, rester dans la grille et éviter les cases occupées.';return;}
   selection=r;preview(r);$('#area').value='';$('#area-help').textContent=`Aire = largeur × hauteur = ${r.w} × ${r.h}.`;
-  $('#feedback').textContent='Emplacement choisi. Calcule l’aire pour valider ton champ.';controls();$('#area').focus();
+  $('#feedback').textContent='Emplacement choisi. Calcule l’aire pour valider ton champ.';NumberDisplay.decorate($('#area-help'));controls();$('#area').focus();
  }
  function turn(message){
   selection=null;rotated=false;$('#feedback').textContent='';draw();controls(message);
@@ -60,16 +65,17 @@
  $('#area-form').onsubmit=event=>{event.preventDefault();if(!selection||busy||aiTurn())return;try{const r=selection;E.place(game,r,Number($('#area').value));turn(`Champ validé : ${r.w} × ${r.h} = ${r.w*r.h}. Au joueur suivant !`);}catch(error){$('#feedback').textContent=error.message+' Multiplie la largeur par la hauteur.';$('#area').focus();}};
  function scoreForm(){
   const section=$('#results');section.hidden=false;section.innerHTML=`<h2>Calculons les scores</h2><p>Au tour de <strong>${escape(names[calculating])}</strong>. Les aires sont inscrites sur les champs. Pour chaque rectangle, le périmètre vaut 2 × (largeur + hauteur).</p><details><summary>Voir mes champs pour faire les calculs</summary><div class="table-wrap"><table><thead><tr><th>Champ</th><th>Dimensions</th><th>Aire</th></tr></thead><tbody>${game.rectangles.filter(r=>r.player===calculating).map((r,i)=>`<tr><td>${i+1}</td><td>${r.w} × ${r.h}</td><td>${r.area}</td></tr>`).join('')}</tbody></table></div></details><form id="score-form" class="fields-results-form"><label>A · Aire totale<input name="area" type="number" min="0" required inputmode="numeric"></label><label>P · Périmètre total<input name="perimeter" type="number" min="0" required inputmode="numeric"></label><label>R · Plus grand champ<input name="largest" type="number" min="0" max="36" required inputmode="numeric"></label><button class="primary">Vérifier mes calculs</button></form><p id="score-feedback" role="status"></p><button id="show-scores">Voir directement les résultats</button>`;
-  $('#show-scores').onclick=finalScores;
+  NumberDisplay.decorate(section);$('#show-scores').onclick=finalScores;
   $('#score-form').onsubmit=event=>{event.preventDefault();const expected=E.totals(game)[calculating],data=new FormData(event.target),labels={area:'aire totale',perimeter:'périmètre total',largest:'plus grand champ'};const errors=Object.keys(labels).filter(k=>Number(data.get(k))!==expected[k]);if(errors.length){$('#score-feedback').textContent='À revoir : '+errors.map(k=>labels[k]).join(', ')+'. Tu peux réessayer ou voir les résultats.';return;}if(calculating===0&&!computer){calculating=1;scoreForm();}else finalScores();};
  }
  function finalScores(){const {totals,criteria,points}=E.scores(game),winner=points[0]===points[1]?'Égalité, bravo aux deux fermiers !':`${names[points[0]>points[1]?0:1]} remporte la partie !`;
-  $('#results').innerHTML=`<h2 class="fields-result-heading">${escape(winner)}</h2><div class="table-wrap"><table><thead><tr><th>Critère</th>${names.map(n=>`<th>${escape(n)}</th>`).join('')}</tr></thead><tbody>${[['area','A · Aire totale'],['perimeter','P · Périmètre total'],['largest','R · Plus grand rectangle']].map(([k,label])=>`<tr><th>${label}</th>${totals.map((t,p)=>`<td>${t[k]} → ${criteria[k][p]} point</td>`).join('')}</tr>`).join('')}<tr><th>Total des points</th>${points.map(p=>`<td><strong>${p}</strong></td>`).join('')}</tr></tbody></table></div><p>Le périmètre total est la somme des périmètres de chaque rectangle, même lorsqu’ils partagent un côté.</p><button id="play-again" class="primary">Rejouer</button>`;$('#play-again').onclick=restart;
+  $('#results').innerHTML=`<h2 class="fields-result-heading">${escape(winner)}</h2><div class="table-wrap"><table><thead><tr><th>Critère</th>${names.map(n=>`<th>${escape(n)}</th>`).join('')}</tr></thead><tbody>${[['area','A · Aire totale'],['perimeter','P · Périmètre total'],['largest','R · Plus grand rectangle']].map(([k,label])=>`<tr><th>${label}</th>${totals.map((t,p)=>`<td>${t[k]} → ${criteria[k][p]} point</td>`).join('')}</tr>`).join('')}<tr><th>Total des points</th>${points.map(p=>`<td><strong>${p}</strong></td>`).join('')}</tr></tbody></table></div><p>Le périmètre total est la somme des périmètres de chaque rectangle, même lorsqu’ils partagent un côté.</p><button id="play-again" class="primary">Rejouer</button>`;NumberDisplay.decorate($('#results'));$('#play-again').onclick=restart;
  }
  function results(){calculating=0;scoreForm();$('#results').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});}
  function restart(){if(game&&!game.finished&&!confirm('Quitter cette partie et en commencer une nouvelle ?'))return;clearTimeout(timer);busy=false;game=null;selection=null;$('#dice').classList.remove('rolling');$('#match').hidden=true;$('#setup').hidden=false;$('#name-red').focus();}
  $('#restart').onclick=restart;
  $('#opponent').onchange=()=>{$('#blue-label').hidden=$('#opponent').value==='computer';$('#name-blue').required=$('#opponent').value!=='computer';};
  $('#setup-form').onsubmit=event=>{event.preventDefault();clearTimeout(timer);computer=$('#opponent').value==='computer';names=[$('#name-red').value.trim()||'Joueur 1',computer?'Ordinateur':$('#name-blue').value.trim()||'Joueur 2'];game=E.create();busy=false;$('#setup').hidden=true;$('#match').hidden=false;$('#results').hidden=true;turn();$('#roll').focus();};
+ $('#fields-number-settings').innerHTML=NumberDisplay.settingsHtml()+MathLearning.settingsHtml();NumberDisplay.bindSettings($('#fields-number-settings'),()=>{MathLearning.apply();if(game){draw();NumberDisplay.decorate($('#area-help'));}});MathLearning.bindSettings($('#fields-number-settings'),()=>{if(game)controls();});MathLearning.apply();
  addEventListener('beforeunload',event=>{if(game&&!game.finished){event.preventDefault();event.returnValue='';}});
 })();

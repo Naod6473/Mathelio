@@ -32,7 +32,7 @@ test('Doom enforces deadline, separates rankings and serves supplied assets',asy
   }
   assert.equal((await call('scores?'+new URLSearchParams(cfg))).body.scores[0].correct,8);
   assert.equal((await call('scores?'+new URLSearchParams({...cfg,track:'cm1'}))).body.scores.length,0);
-  for(const [file,mime] of [['assets/images/logo.png','image/png'],['assets/audio/doom/doom-01.mp3','audio/mpeg'],['fields.html','text/html; charset=utf-8'],['fields.css','text/css; charset=utf-8'],['fields.js','text/javascript; charset=utf-8'],['fields-engine.js','text/javascript; charset=utf-8']]){const r=await fetch(base+'/'+file);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),mime);await r.arrayBuffer();}
+  for(const [file,mime] of [['assets/images/logo.png','image/png'],['assets/audio/doom/doom-01.mp3','audio/mpeg'],['fields.html','text/html; charset=utf-8'],['fields.css','text/css; charset=utf-8'],['fields.js','text/javascript; charset=utf-8'],['fields-engine.js','text/javascript; charset=utf-8'],['number-display.js','text/javascript; charset=utf-8'],['learning.js','text/javascript; charset=utf-8']]){const r=await fetch(base+'/'+file);assert.equal(r.status,200);assert.equal(r.headers.get('content-type'),mime);await r.arrayBuffer();}
  }finally{await new Promise(r=>server.close(r));app.close();}
 });
 

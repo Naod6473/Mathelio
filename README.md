@@ -18,6 +18,18 @@ Application et classement persistant sur http://127.0.0.1:4319 ; base `data/math
 
 ## Jouer
 
+### Aides pour apprendre à son rythme
+
+Dans Réglages, six interrupteurs indépendants activent le mode calme, le tableau de numération, les pièces de base dix, la correction par étapes, les grands chiffres/boutons et l’écran épuré. Le mode calme utilise l’entraînement et le passage manuel ; les corrections par étapes désactivent également le passage automatique. Doom conserve ses règles, ses contrôles de temps et ne propose pas les aides de calcul.
+
+Le tableau aligne les opérandes et la réponse saisie dans les colonnes CM/DM/M/C/D/U/d/c. Le matériel représente les entiers de 0 à 9 999 ; cliquer une pièce la sélectionne pour compter, et les échanges d’un paquet contre dix pièces (ou l’inverse) préservent la quantité. L’affichage est limité à 200 pièces après échanges. Les corrections décomposent un calcul après validation, une étape à la fois. Toutes ces préférences restent propres au navigateur ; aucune lecture audio n’est ajoutée.
+
+### Repères de numération
+
+Dans Réglages, une couleur peut être choisie pour les unités, dizaines, centaines et milliers parmi huit couleurs sombres contrastées sur un fond blanc. Un aperçu, un bouton de réinitialisation et une option de lettres U/D/C/M complètent le menu. Les décimales restent noires ; les lettres d/c/m distinguent dixièmes, centièmes et millièmes. Pour les nombres à cinq ou six chiffres, DM/CM utilisent respectivement les couleurs des dizaines/centaines.
+
+Les calculs, corrections et l’aperçu de la réponse saisie utilisent ces repères. Le champ de saisie reste un champ standard : sa valeur n’est ni transformée ni limitée par l’affichage coloré. Les lecteurs d’écran reçoivent le nombre complet, sans les lettres décoratives. Les préférences sont propres au navigateur, partagées entre profils, et distinctes des sauvegardes des profils. Le mode Guerre des champs propose également le menu et colore les aires des champs ; les lettres ne sont pas affichées à l’intérieur des petites cases.
+
 ### La guerre des champs
 
 Accessible depuis l’accueil ou `fields.html`. Deux joueurs sur le même écran ou un joueur contre l’ordinateur, sur une grille de 23 × 15 avec deux fermes et un arbre central. Les deux dés définissent les dimensions du rectangle, que l’on peut tourner. Le joueur choisit un emplacement puis calcule l’aire avant de valider. Un indice propose un emplacement légal.
